@@ -96,13 +96,13 @@ class DilocoSimulator(Evaluator, SpartaInterpolator):
             if self.config.p_sparta > 0.0:
                 self._interpolate_models()
 
-            loss = self._train_step()
-
             if self.local_step % self.config.diloco_interval == 0 and self.local_step > 0:
                 self._outer_step()
 
-            if self.local_step % self.config.eval_interval == 0 and self.local_step > 0:
+            if self.local_step % self.config.eval_interval == 0:
                 self._evaluate()
+
+            loss = self._train_step()
 
             self.local_step += 1
 
