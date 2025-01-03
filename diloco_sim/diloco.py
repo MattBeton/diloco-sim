@@ -51,9 +51,13 @@ class DilocoSimulator(Evaluator, SpartaInterpolator):
     def _train_step(self):
         x, y = self._get_batch()
         self.optimizer.zero_grad()
-        output = self.model(x)
-        loss = self.config.loss_fn(output, y)
-        loss.backward()
+        mini_batch_size = self.config.max_minibatch_size or self.config.batch_size
+        for i in range(0, len(x), mini_batch_size):
+            x_mini = x[i : i + self.mini_batch_size]
+            y_mini = y[i : i + self.mini_batch_size]
+            output = self.model(x_mini)
+            loss = self.config.loss_fn(output, y_mini)
+            loss.backward()
         self.optimizer.step()
         if self.scheduler:
             self.scheduler.step()

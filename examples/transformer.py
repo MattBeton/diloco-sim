@@ -19,6 +19,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--batch_size", "-b", type=int, nargs="+", default=32)
+    parser.add_argument("--max_minibatch_size", type=int, default=None)
     parser.add_argument("--num_nodes", "-n", type=int, nargs="+", default=4)
     parser.add_argument("--p_sparta", "-p", type=float, nargs="+", default=0.0)
     parser.add_argument("--learning_rate", "-lr", type=float, nargs="+", default=0.001)
@@ -95,6 +96,7 @@ if __name__ == "__main__":
             cosine_anneal=args.cosine_anneal,
             warmup_steps=args.warmup_steps,
             p_sparta=args.p_sparta,
+            max_minibatch_size=args.max_minibatch_size,
         )
 
         diloco_sim = DilocoSimulator(diloco_config)
