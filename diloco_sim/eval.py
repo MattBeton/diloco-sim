@@ -23,7 +23,7 @@ class Evaluator(DilocoSetup):
 
         for param in self.model.parameters():
             torch.distributed.all_reduce(param.data, op=torch.distributed.ReduceOp.SUM)
-            param.data /= self.num_nodes
+            param.data /= self.config.num_nodes
 
         if self.rank != 0:
             return
