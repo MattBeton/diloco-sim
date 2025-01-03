@@ -25,9 +25,6 @@ class Evaluator(DilocoSetup):
             torch.distributed.all_reduce(param.data, op=torch.distributed.ReduceOp.SUM)
             param.data /= self.config.num_nodes
 
-        if self.rank != 0:
-            return
-
         losses = []
         num_batches = math.ceil(self.config.eval_iters / self.config.batch_size)
         with torch.no_grad():
