@@ -49,7 +49,7 @@ class DilocoSetup:
 
     def _initialize_distributed(self, rank: int):
         os.environ["MASTER_ADDR"] = "127.0.0.1"
-        os.environ["MASTER_PORT"] = "12355"
+        os.environ["MASTER_PORT"] = str(self.config.port)
         self.rank = rank
         init_process_group(
             backend=(

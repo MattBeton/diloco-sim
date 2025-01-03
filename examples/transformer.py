@@ -40,6 +40,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--model_size", type=str, nargs="+", default="small", choices=["small", "base", "medium", "large", "xl"]
     )
+    parser.add_argument("--port", type=int, default=12355)
     parser.add_argument("--seed", type=int, nargs="+", default=None)
     parser.add_argument("--dataset_path", type=str, default="data/owt/openwebtext.bin")
     parser.add_argument("--profile", action="store_true")
@@ -97,6 +98,8 @@ if __name__ == "__main__":
             warmup_steps=args.warmup_steps,
             p_sparta=args.p_sparta,
             max_minibatch_size=args.max_minibatch_size,
+            gpu_offset=args.gpu_offset,
+            port=args.port,
         )
 
         diloco_sim = DilocoSimulator(diloco_config)

@@ -30,3 +30,4 @@ class DilocoSimulatorConfig:
     wandb_project: Optional[str] = None
     gpu_offset: int = 0
     max_minibatch_size: Optional[int] = None
+    port: int = 12355
