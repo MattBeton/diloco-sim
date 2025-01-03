@@ -22,9 +22,8 @@ class Evaluator(DilocoSetup):
         self.model.eval()
 
         for param in self.model.parameters():
-            torch.distributed.reduce(param.data, dst=0, op=torch.distributed.ReduceOp.SUM)
-            if self.rank == 0:
-                param.data /= self.num_nodes
+            torch.distributed.all_reduce(param.data, op=torch.distributed.ReduceOp.SUM)
+            param.data /= self.num_nodes
 
         if self.rank != 0:
             return
@@ -40,9 +39,10 @@ class Evaluator(DilocoSetup):
 
         avg_loss = sum(losses) / len(losses)
 
-        print(f"Eval Loss: {avg_loss:.4f}, Eval Perplexity: {math.exp(avg_loss):.4f}")
+        if self.rank == 0:
+            print(f"Eval Loss: {avg_loss:.4f}, Eval Perplexity: {math.exp(avg_loss):.4f}")
 
-        self._log_eval(EvalStats(loss=avg_loss, perplexity=math.exp(avg_loss)))
+            self._log_eval(EvalStats(loss=avg_loss, perplexity=math.exp(avg_loss)))
 
         self.model.load_state_dict(original_state_dict)
 
