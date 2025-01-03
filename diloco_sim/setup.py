@@ -105,12 +105,13 @@ class DilocoSetup:
             if current_step < self.config.warmup_steps:
                 return float(current_step) / float(max(self.config.warmup_steps, 1))
             elif self.config.cosine_anneal:
+                min_lr_factor = 0.1
                 progress = (current_step - self.config.warmup_steps) / float(
                     max(1, self.config.max_local_step - self.config.warmup_steps)
                 )
-                return 0.5 * (1.0 + math.cos(math.pi * progress))
+                cosine_term = 0.5 * (1.0 + math.cos(math.pi * progress))
+                return (1 - min_lr_factor) * cosine_term + min_lr_factor
             else:
-                # Default constant LR after warmup
                 return 1.0
 
         self.scheduler = LambdaLR(self.optimizer, lr_lambda)

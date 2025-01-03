@@ -30,10 +30,12 @@ if __name__ == "__main__":
     parser.add_argument("--ckpt_interval", type=int, nargs="+", default=None)
     parser.add_argument("--model_path", type=str, nargs="+", default=None)
     parser.add_argument("--wandb_project", type=str, nargs="+", default=None)
-    parser.add_argument("--eval_iters", type=int, nargs="+", default=400)
+    parser.add_argument("--eval_iters", type=int, default=400)
+    parser.add_argument("--eval_interval", type=int, default=1000)
     parser.add_argument("--diloco_interval", type=int, nargs="+", default=500)
     parser.add_argument("--cosine_anneal", type=str2bool, nargs="+", default=False)
     parser.add_argument("--warmup_steps", type=int, nargs="+", default=0)
+    parser.add_argument("--gpu_offset", type=int, default=0)
     parser.add_argument(
         "--model_size", type=str, nargs="+", default="small", choices=["small", "base", "medium", "large", "xl"]
     )
@@ -83,6 +85,7 @@ if __name__ == "__main__":
             model_path=args.model_path,
             wandb_project=args.wandb_project,
             eval_iters=args.eval_iters,
+            eval_interval=args.eval_interval,
             diloco_interval=args.diloco_interval,
             outer_optimizer_kwargs={
                 "lr": args.outer_learning_rate,

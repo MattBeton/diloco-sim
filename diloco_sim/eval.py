@@ -18,7 +18,16 @@ class Evaluator(DilocoSetup):
         super().__init__(config)
 
     def _evaluate(self):
+        original_state_dict = {k: v.clone() for k, v in self.model.state_dict().items()}
         self.model.eval()
+
+        for param in self.model.parameters():
+            torch.distributed.reduce(param.data, dst=0, op=torch.distributed.ReduceOp.SUM)
+            if self.rank == 0:
+                param.data /= self.num_nodes
+
+        if self.rank != 0:
+            return
 
         losses = []
         num_batches = math.ceil(self.config.eval_iters / self.config.batch_size)
@@ -34,6 +43,8 @@ class Evaluator(DilocoSetup):
         print(f"Eval Loss: {avg_loss:.4f}, Eval Perplexity: {math.exp(avg_loss):.4f}")
 
         self._log_eval(EvalStats(loss=avg_loss, perplexity=math.exp(avg_loss)))
+
+        self.model.load_state_dict(original_state_dict)
 
         self.model.train()
 

@@ -15,6 +15,7 @@ class DilocoSimulatorConfig:
     eval_dataset: Optional[torch.utils.data.Dataset] = None
     ckpt_interval: Optional[int] = None  # num of outersteps to save model
     eval_iters: int = 400
+    eval_interval: int = 1000
     save_dir: Optional[str] = None
     num_epochs: int = 1
     p_sparta: float = 0.0
@@ -27,3 +28,4 @@ class DilocoSimulatorConfig:
     outer_optimizer_kwargs: dict = field(default_factory=lambda: {"lr": 0.7, "nesterov": True, "momentum": 0.9})
     max_local_step: Optional[int] = None
     wandb_project: Optional[str] = None
+    gpu_offset: int = 0
