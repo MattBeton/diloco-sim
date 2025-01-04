@@ -7,6 +7,7 @@ from .eval import Evaluator
 from .sparta import SpartaInterpolator
 from dataclasses import dataclass
 import wandb
+import torch.nn.utils as nn_utils
 
 
 @dataclass
@@ -58,6 +59,8 @@ class DilocoSimulator(Evaluator, SpartaInterpolator):
             output = self.model(x_mini)
             loss = self.config.loss_fn(output, y_mini)
             loss.backward()
+        if self.config.max_norm:
+            nn_utils.clip_grad_norm_(self.model.parameters(), max_norm=self.config.max_norm)
         self.optimizer.step()
         if self.scheduler:
             self.scheduler.step()
@@ -93,7 +96,7 @@ class DilocoSimulator(Evaluator, SpartaInterpolator):
 
         while self.local_step < self.max_local_step:
 
-            if self.config.p_sparta > 0.0:
+            if self.config.p_sparta > 0.0 and self.local_step % self.config.sparta_interval == 0:
                 self._interpolate_models()
 
             if self.local_step % self.config.diloco_interval == 0 and self.local_step > 0:

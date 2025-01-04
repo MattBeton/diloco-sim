@@ -22,6 +22,7 @@ if __name__ == "__main__":
     parser.add_argument("--max_minibatch_size", type=int, default=None)
     parser.add_argument("--num_nodes", "-n", type=int, nargs="+", default=4)
     parser.add_argument("--p_sparta", "-p", type=float, nargs="+", default=0.0)
+    parser.add_argument("--sparta_interval", type=int, nargs="+", default=1)
     parser.add_argument("--learning_rate", "-lr", type=float, nargs="+", default=0.001)
     parser.add_argument("--outer_learning_rate", type=float, nargs="+", default=0.7)
     parser.add_argument("--nesterov", type=str2bool, nargs="+", default=True)
@@ -40,6 +41,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--model_size", type=str, nargs="+", default="small", choices=["small", "base", "medium", "large", "xl"]
     )
+    parser.add_argument("--max_norm", type=float, nargs="+", default=None)
     parser.add_argument("--port", type=int, default=12355)
     parser.add_argument("--seed", type=int, nargs="+", default=None)
     parser.add_argument("--dataset_path", type=str, default="data/owt/openwebtext.bin")
@@ -97,9 +99,11 @@ if __name__ == "__main__":
             cosine_anneal=args.cosine_anneal,
             warmup_steps=args.warmup_steps,
             p_sparta=args.p_sparta,
+            sparta_interval=args.sparta_interval,
             max_minibatch_size=args.max_minibatch_size,
             port=args.port,
             devices=args.devices,
+            max_norm=args.max_norm,
         )
 
         diloco_sim = DilocoSimulator(diloco_config)

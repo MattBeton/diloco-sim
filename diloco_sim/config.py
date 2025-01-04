@@ -19,6 +19,7 @@ class DilocoSimulatorConfig:
     save_dir: Optional[str] = None
     num_epochs: int = 1
     p_sparta: float = 0.0
+    sparta_interval: int = 1
     cosine_anneal: bool = False
     warmup_steps: int = 0
     model_path: Optional[str] = None
@@ -31,3 +32,4 @@ class DilocoSimulatorConfig:
     max_minibatch_size: Optional[int] = None
     port: int = 12355
     devices: list[int] = []
+    max_norm: Optional[float] = None
