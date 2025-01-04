@@ -60,7 +60,9 @@ class DilocoSetup:
             world_size=self.config.num_nodes,
         )
         self.device = torch.device(
-            f"cuda:{self.config.devices[rank % len(self.config.devices)]}" if torch.cuda.is_available() else "cpu"
+            f"cuda:{self.config.devices[rank % len(self.config.devices)]}"
+            if torch.cuda.is_available() and self.config.devices
+            else "cpu"
         )
         torch.cuda.set_device(self.device) if self.device.type == "cuda" else None
         print(f"Initialized process group with rank {rank} on device {self.device}")

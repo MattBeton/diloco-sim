@@ -37,7 +37,7 @@ if __name__ == "__main__":
     parser.add_argument("--diloco_interval", type=int, nargs="+", default=500)
     parser.add_argument("--cosine_anneal", type=str2bool, nargs="+", default=False)
     parser.add_argument("--warmup_steps", type=int, nargs="+", default=0)
-    parser.add_argument("--devices", type=int, nargs="+", default=[])
+    parser.add_argument("--devices", type=int, nargs="+", default=None)
     parser.add_argument(
         "--model_size", type=str, nargs="+", default="small", choices=["small", "base", "medium", "large", "xl"]
     )
@@ -51,7 +51,7 @@ if __name__ == "__main__":
 
     base_args = parser.parse_args()
 
-    for args in arg_combinations(base_args):
+    for args in arg_combinations(base_args, leave_as_list=["devices"]):
 
         print("Running with args:\n", args)
 
