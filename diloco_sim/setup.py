@@ -53,16 +53,14 @@ class DilocoSetup:
         self.rank = rank
         init_process_group(
             backend=(
-                "nccl" if torch.cuda.is_available() and self.config.num_nodes == torch.cuda.device_count() else "gloo"
+                "nccl" if torch.cuda.is_available() and len(self.config.devices) == self.config.num_nodes else "gloo"
             ),
             # init_method="env://",
             rank=rank,
             world_size=self.config.num_nodes,
         )
         self.device = torch.device(
-            f"cuda:{(rank + self.config.gpu_offset) % torch.cuda.device_count()}"
-            if torch.cuda.is_available()
-            else "cpu"
+            f"cuda:{self.config.devices[rank % len(self.config.devices)]}" if torch.cuda.is_available() else "cpu"
         )
         torch.cuda.set_device(self.device) if self.device.type == "cuda" else None
         print(f"Initialized process group with rank {rank} on device {self.device}")

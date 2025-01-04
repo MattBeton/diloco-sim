@@ -19,10 +19,12 @@ def str2bool(v):
         raise argparse.ArgumentTypeError("Boolean value expected.")
 
 
-def arg_combinations(args):
+def arg_combinations(args, leave_as_list=[]):
     # Identify arguments that are lists of values and should be iterated over
     args_dict = vars(args)
-    list_args = {key: value for key, value in args_dict.items() if isinstance(value, list)}
+    list_args = {
+        key: value for key, value in args_dict.items() if isinstance(value, list) and key not in leave_as_list
+    }
 
     # Identify static arguments (those with a single value)
     static_args = {key: value for key, value in args_dict.items() if key not in list_args}

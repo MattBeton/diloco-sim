@@ -36,7 +36,7 @@ if __name__ == "__main__":
     parser.add_argument("--diloco_interval", type=int, nargs="+", default=500)
     parser.add_argument("--cosine_anneal", type=str2bool, nargs="+", default=False)
     parser.add_argument("--warmup_steps", type=int, nargs="+", default=0)
-    parser.add_argument("--gpu_offset", type=int, default=0)
+    parser.add_argument("--devices", type=int, nargs="+", default=[])
     parser.add_argument(
         "--model_size", type=str, nargs="+", default="small", choices=["small", "base", "medium", "large", "xl"]
     )
@@ -98,13 +98,16 @@ if __name__ == "__main__":
             warmup_steps=args.warmup_steps,
             p_sparta=args.p_sparta,
             max_minibatch_size=args.max_minibatch_size,
-            gpu_offset=args.gpu_offset,
             port=args.port,
+            devices=args.devices,
         )
 
         diloco_sim = DilocoSimulator(diloco_config)
 
         assert args.train ^ args.generate ^ args.profile, "Must specify exactly one of train, generate, profile"
+
+        for device in args.devices:
+            assert device < torch.cuda.device_count(), f"Device {device} not available"
 
         if args.model_path:
             diloco_sim.load_model(args.model_path)

@@ -28,6 +28,6 @@ class DilocoSimulatorConfig:
     outer_optimizer_kwargs: dict = field(default_factory=lambda: {"lr": 0.7, "nesterov": True, "momentum": 0.9})
     max_local_step: Optional[int] = None
     wandb_project: Optional[str] = None
-    gpu_offset: int = 0
     max_minibatch_size: Optional[int] = None
     port: int = 12355
+    devices: list[int] = []
