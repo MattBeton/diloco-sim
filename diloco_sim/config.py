@@ -31,5 +31,5 @@ class DilocoSimulatorConfig:
     wandb_project: Optional[str] = None
     max_minibatch_size: Optional[int] = None
     port: int = 12355
-    devices: list[int] = []
+    devices: Optional[list[int]] = None
     max_norm: Optional[float] = None
