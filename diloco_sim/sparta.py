@@ -10,6 +10,7 @@ class SpartaInterpolator(DilocoSetup):
     def __init__(self, config: DilocoSimulatorConfig) -> None:
         super().__init__(config)
         self.index_selector = PartitionedIndexSelector(self.config.p_sparta)
+        self.buffer: list[tuple[torch.Tensor, torch.Tensor]] = []  # (indices, values)
 
     def _interpolate_models(self):
         with torch.no_grad():
@@ -21,7 +22,10 @@ class SpartaInterpolator(DilocoSetup):
                 sparse_data = param.data[indices]
                 dist.all_reduce(sparse_data, op=dist.ReduceOp.SUM)
                 sparse_data /= self.config.num_nodes
-                param.masked_scatter_(indices, sparse_data)
+                self.buffer.append((indices, sparse_data))
+                if len(self.buffer) > self.config.async_sparta_delay:
+                    indices_popped, sparse_data_popped = self.buffer.pop(0)
+                    param.masked_scatter_(indices_popped, sparse_data_popped)
 
 
 class IndexSelector:

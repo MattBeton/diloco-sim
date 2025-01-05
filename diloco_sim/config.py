@@ -33,3 +33,4 @@ class DilocoSimulatorConfig:
     port: int = 12355
     devices: Optional[list[int]] = None
     max_norm: Optional[float] = None
+    async_sparta_delay: int = 0
