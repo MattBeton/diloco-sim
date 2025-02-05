@@ -50,8 +50,7 @@ class Evaluator(DilocoSetup):
             return
         wandb.log(
             {
-                "step": self.local_step,
-                "eval_loss": eval_stats.loss,
-                "eval_perplexity": eval_stats.perplexity,
-            }
+                "val_local_loss": eval_stats.loss,
+                "val_local_perplexity": eval_stats.perplexity,
+            }, step=self.local_step
         )

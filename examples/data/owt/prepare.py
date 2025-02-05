@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 # Load the OpenWebText dataset from HuggingFace
 def download_openwebtext():
-    dataset = load_dataset("openwebtext", split="train")
+    dataset = load_dataset("openwebtext", split="train[:10%]")
     return dataset
 
 
@@ -50,6 +50,8 @@ def main():
     print("Step 1: Downloading OpenWebText dataset...")
     dataset = download_openwebtext()
 
+    print(dataset)
+
     print("Step 2: Tokenizing the dataset...")
     tokenizer = AutoTokenizer.from_pretrained("gpt2")  # Using GPT-2 tokenizer
 
@@ -65,3 +67,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

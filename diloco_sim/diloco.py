@@ -88,7 +88,7 @@ class DilocoSimulator(Evaluator, SpartaInterpolator):
                 "step": self.local_step,
                 "train_loss": train_stats.loss,
                 "train_perplexity": train_stats.perplexity,
-                "learning_rate": lr,
+                "lr": lr,
             }
         )
 
