@@ -71,6 +71,9 @@ class DilocoSimulator(Evaluator, SpartaInterpolator):
         return loss.item()
 
     def _log_train(self, train_stats: TrainStats):
+        if self.rank != 0:
+            return
+
         lr = self.optimizer.param_groups[0]["lr"]
         self.pbar.update(1)
         self.pbar.set_postfix(
@@ -93,7 +96,6 @@ class DilocoSimulator(Evaluator, SpartaInterpolator):
         )
 
     def _train_loop(self):
-
         while self.local_step < self.max_local_step:
 
             if self.config.p_sparta > 0.0 and self.local_step % self.config.sparta_interval == 0:
@@ -104,6 +106,9 @@ class DilocoSimulator(Evaluator, SpartaInterpolator):
 
             if self.local_step % self.config.eval_interval == 0:
                 self._evaluate()
+
+            if self.local_step % self.config.ckpt_interval == 0:
+                self._save_checkpoint()
 
             loss = self._train_step()
 

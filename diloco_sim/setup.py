@@ -45,7 +45,43 @@ class DilocoSetup:
         self.pbar = tqdm(total=self.max_local_step)
 
         if self.config.wandb_project:
-            wandb.init(project=self.config.wandb_project, config=self.config.__dict__)
+            # Handle wandb initialization across ranks
+            if self.rank == 0:
+                wandb.init(project=self.config.wandb_project, config=self.config.__dict__)
+                run_id = wandb.run.id
+                run_name = wandb.run.name
+                # Broadcast run_id and run_name to other ranks
+                self._broadcast_run_info(run_id, run_name)
+            else:
+                run_id, run_name = self._receive_run_info()
+                # print(run_id, run_name)
+                wandb.init(project=self.config.wandb_project, config=self.config.__dict__,
+                        id=run_id.strip(), name=run_name.strip(), resume="allow")
+
+    def _broadcast_run_info(self, run_id: str, run_name: str):
+        """Broadcast run ID and name from rank 0 to others."""
+        max_length = 256
+        run_id_encoded = run_id.ljust(max_length).encode('utf-8')
+        run_name_encoded = run_name.ljust(max_length).encode('utf-8')
+        
+        run_id_tensor = torch.tensor(list(run_id_encoded), dtype=torch.uint8).to(self.device)
+        run_name_tensor = torch.tensor(list(run_name_encoded), dtype=torch.uint8).to(self.device)
+        
+        torch.distributed.broadcast(run_id_tensor, src=0)
+        torch.distributed.broadcast(run_name_tensor, src=0)
+
+    def _receive_run_info(self) -> tuple:
+        """Receive run ID and name from rank 0."""
+        max_length = 256
+        run_id_tensor = torch.zeros(max_length, dtype=torch.uint8).to(self.device)
+        run_name_tensor = torch.zeros(max_length, dtype=torch.uint8).to(self.device)
+        
+        torch.distributed.broadcast(run_id_tensor, src=0)
+        torch.distributed.broadcast(run_name_tensor, src=0)
+        
+        run_id = run_id_tensor.cpu().numpy().tobytes().decode('utf-8').strip('\x00')
+        run_name = run_name_tensor.cpu().numpy().tobytes().decode('utf-8').strip('\x00')
+        return run_id, run_name
 
     def _initialize_distributed(self, rank: int):
         os.environ["MASTER_ADDR"] = "127.0.0.1"
@@ -139,8 +175,16 @@ class DilocoSetup:
         )
         self.eval_data_iter = iter(self.eval_dataloader)
 
+    # def _save_checkpoint(self):
+    #     torch.save(self.model.state_dict(), os.path.join(self.config.save_dir, f"model_{self.epoch}.pt"))
+
     def _save_checkpoint(self):
-        torch.save(self.model.state_dict(), os.path.join(self.config.save_dir, f"model_{self.epoch}.pt"))
+        wandb_run_id = wandb.run.name
+        if not os.path.exists(os.path.join(self.config.save_dir, self.config.wandb_project, wandb_run_id, str(self.rank))):
+            os.makedirs(os.path.join(self.config.save_dir, self.config.wandb_project, wandb_run_id, str(self.rank)), exist_ok=True)
+
+        filename = f"{self.local_step}.pt"
+        torch.save(self.model.state_dict(), os.path.join(self.config.save_dir, self.config.wandb_project, wandb_run_id, str(self.rank), filename))
 
     def _get_batch(self, eval=False):
         if not eval or self.eval_data_iter is None:
@@ -167,8 +211,8 @@ class DilocoSetup:
         self._setup_optimizer()
         self._setup_scheduler()
         self._setup_train_dataloader()
+        self._initialize_logging()
         if self.rank == 0:
-            self._initialize_logging()
             self._setup_master_model()
             self._setup_master_optimizer()
             if self.config.eval_dataset:

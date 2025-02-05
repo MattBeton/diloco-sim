@@ -23,12 +23,12 @@ if __name__ == "__main__":
     parser.add_argument("--num_nodes", "-n", type=int, nargs="+", default=4)
     parser.add_argument("--p_sparta", "-p", type=float, nargs="+", default=0.0)
     parser.add_argument("--sparta_interval", type=int, nargs="+", default=1)
-    parser.add_argument("--learning_rate", "-lr", type=float, nargs="+", default=0.001)
+    parser.add_argument("--learning_rate", "-lr", type=float, nargs="+", default=0.0004)
     parser.add_argument("--outer_learning_rate", type=float, nargs="+", default=0.7)
     parser.add_argument("--nesterov", type=str2bool, nargs="+", default=True)
     parser.add_argument("--outer_momentum", type=float, nargs="+", default=0.9)
     parser.add_argument("--max_local_step", type=int, nargs="+", default=5000)
-    parser.add_argument("--save_dir", type=str, nargs="+", default=None)
+    parser.add_argument("--save_dir", type=str, nargs="+", default='checkpoints/')
     parser.add_argument("--ckpt_interval", type=int, nargs="+", default=100)
     parser.add_argument("--model_path", type=str, nargs="+", default=None)
     parser.add_argument("--wandb_project", type=str, nargs="+", default="transformer_owt")
@@ -37,7 +37,7 @@ if __name__ == "__main__":
     parser.add_argument("--async_sparta_delay", type=int, nargs="+", default=0)
     parser.add_argument("--diloco_interval", type=int, nargs="+", default=100)
     parser.add_argument("--cosine_anneal", action='store_true')
-    parser.add_argument("--warmup_steps", type=int, nargs="+", default=0)
+    parser.add_argument("--warmup_steps", type=int, nargs="+", default=3000)
     parser.add_argument("--devices", type=int, nargs="+", default=None)
     parser.add_argument(
         "--model_size", type=str, nargs="+", default="small", choices=["small", "base", "medium", "large", "xl"]
