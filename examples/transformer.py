@@ -36,7 +36,7 @@ if __name__ == "__main__":
     parser.add_argument("--eval_interval", type=int, default=100)
     parser.add_argument("--async_sparta_delay", type=int, nargs="+", default=0)
     parser.add_argument("--diloco_interval", type=int, nargs="+", default=100)
-    parser.add_argument("--cosine_anneal", type=str2bool, nargs="+", default=False)
+    parser.add_argument("--cosine_anneal", action='store_true')
     parser.add_argument("--warmup_steps", type=int, nargs="+", default=0)
     parser.add_argument("--devices", type=int, nargs="+", default=None)
     parser.add_argument(
