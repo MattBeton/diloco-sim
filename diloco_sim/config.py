@@ -34,3 +34,4 @@ class DilocoSimulatorConfig:
     devices: Optional[list[int]] = None
     max_norm: Optional[float] = None
     async_sparta_delay: int = 0
+    wandb_name: str = None
