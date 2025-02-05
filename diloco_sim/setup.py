@@ -47,7 +47,9 @@ class DilocoSetup:
         if self.config.wandb_project:
             # Handle wandb initialization across ranks
             if self.rank == 0:
-                wandb.init(project=self.config.wandb_project, config=self.config.__dict__)
+                wandb.init(project=self.config.wandb_project, 
+                           config=self.config.__dict__,
+                           name=self.config.wandb_name if self.config.wandb_name else None)
                 run_id = wandb.run.id
                 run_name = wandb.run.name
                 # Broadcast run_id and run_name to other ranks

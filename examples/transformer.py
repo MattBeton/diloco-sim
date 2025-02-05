@@ -32,6 +32,7 @@ if __name__ == "__main__":
     parser.add_argument("--ckpt_interval", type=int, nargs="+", default=100)
     parser.add_argument("--model_path", type=str, nargs="+", default=None)
     parser.add_argument("--wandb_project", type=str, nargs="+", default="transformer_owt")
+    parser.add_argument("--wandb_name", type=str, default=None)
     parser.add_argument("--eval_iters", type=int, default=400)
     parser.add_argument("--eval_interval", type=int, default=100)
     parser.add_argument("--async_sparta_delay", type=int, nargs="+", default=0)
@@ -105,6 +106,7 @@ if __name__ == "__main__":
             port=args.port,
             devices=args.devices,
             max_norm=args.max_norm,
+            wandb_name=args.wandb_name,
         )
 
         diloco_sim = DilocoSimulator(diloco_config)
