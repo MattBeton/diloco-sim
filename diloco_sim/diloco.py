@@ -10,6 +10,7 @@ import wandb
 import torch.nn.utils as nn_utils
 import os
 import numpy as np
+from torch.amp import autocast, GradScaler
 
 @dataclass
 class TrainStats:
@@ -51,23 +52,24 @@ class DilocoSimulator(Evaluator, SpartaInterpolator):
         self._broadcast_model_params()
 
     def _train_step(self):
-        x, y = self._get_batch()
-        self.optimizer.zero_grad()
-        mini_batch_size = self.config.max_minibatch_size or self.config.batch_size
-        for i in range(0, len(x), mini_batch_size):
-            x_mini = x[i : i + mini_batch_size]
-            y_mini = y[i : i + mini_batch_size]
-            output = self.model(x_mini)
-            loss = self.config.loss_fn(output, y_mini)
-            loss.backward()
-        if self.config.max_norm:
-            nn_utils.clip_grad_norm_(self.model.parameters(), max_norm=self.config.max_norm)
-        self.optimizer.step()
-        if self.scheduler:
-            self.scheduler.step()
+        with autocast('cuda'):
+            x, y = self._get_batch()
+            self.optimizer.zero_grad()
+            mini_batch_size = self.config.max_minibatch_size or self.config.batch_size
+            for i in range(0, len(x), mini_batch_size):
+                x_mini = x[i : i + mini_batch_size]
+                y_mini = y[i : i + mini_batch_size]
+                output = self.model(x_mini)
+                loss = self.config.loss_fn(output, y_mini)
+                loss.backward()
+            if self.config.max_norm:
+                nn_utils.clip_grad_norm_(self.model.parameters(), max_norm=self.config.max_norm)
+            self.optimizer.step()
+            if self.scheduler:
+                self.scheduler.step()
 
-        if self.rank == 0:
-            self._log_train(TrainStats(loss=loss.item(), perplexity=torch.exp(loss).item()))
+            if self.rank == 0:
+                self._log_train(TrainStats(loss=loss.item(), perplexity=torch.exp(loss).item()))
 
         return loss.item()
 
@@ -155,10 +157,10 @@ class DilocoSimulator(Evaluator, SpartaInterpolator):
             if self.local_step % self.config.eval_interval == 0:
                 self._evaluate()
 
-            if self.local_step % self.config.ckpt_interval == 0:
+            if self.config.ckpt_interval and self.local_step % self.config.ckpt_interval == 0:
                 self._save_checkpoint()
 
-            if self.local_step % self.config.corr_interval == 0:
+            if self.config.corr_interval and self.local_step % self.config.corr_interval == 0:
                 self._correlation_calculation()
 
             loss = self._train_step()

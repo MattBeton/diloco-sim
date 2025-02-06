@@ -46,7 +46,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("--max_norm", type=float, nargs="+", default=None)
     parser.add_argument("--port", type=int, default=12355)
-    parser.add_argument("--seed", type=int, nargs="+", default=None)
+    parser.add_argument("--seed", type=int, nargs="+", default=1337)
     parser.add_argument("--dataset_path", type=str, default="data/owt/openwebtext.bin")
     parser.add_argument("--profile", action="store_true")
     parser.add_argument("--train", action="store_true")
@@ -62,6 +62,10 @@ if __name__ == "__main__":
             torch.manual_seed(args.seed)
             np.random.seed(args.seed)
             random.seed(args.seed)
+
+        torch.backends.cuda.matmul.allow_tf32 = True
+        torch.backends.cudnn.allow_tf32 = True
+
 
         gptconf = {
             "small": GPTConfig.gpt2_small,
