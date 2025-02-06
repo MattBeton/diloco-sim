@@ -55,18 +55,19 @@ class Evaluator(DilocoSetup):
             # Other ranks do not perform evaluation but must participate in broadcast.
             pass
 
-        # Broadcast the global loss from rank 1 to all ranks.
-        # All ranks create a dummy tensor to participate.
-        global_loss_tensor = torch.empty(1, device=next(self.model.parameters()).device)
-        if self.rank == 1:
-            global_loss_tensor[0] = global_loss
-        torch.distributed.broadcast(global_loss_tensor, src=1)
+        if self.config.num_nodes > 1:
+            # Broadcast the global loss from rank 1 to all ranks.
+            # All ranks create a dummy tensor to participate.
+            global_loss_tensor = torch.empty(1, device=next(self.model.parameters()).device)
+            if self.rank == 1:
+                global_loss_tensor[0] = global_loss
+            torch.distributed.broadcast(global_loss_tensor, src=1)
 
-        # Only rank 0 logs the global evaluation.
-        if self.rank == 0:
-            global_loss = global_loss_tensor.item()
-            print(f"GLOBAL: Eval Loss: {global_loss:.4f}, Eval Perplexity: {math.exp(global_loss):.4f}")
-            self._log_eval(EvalStats(loss=global_loss, perplexity=math.exp(global_loss), glob=True))
+            # Only rank 0 logs the global evaluation.
+            if self.rank == 0:
+                global_loss = global_loss_tensor.item()
+                print(f"GLOBAL: Eval Loss: {global_loss:.4f}, Eval Perplexity: {math.exp(global_loss):.4f}")
+                self._log_eval(EvalStats(loss=global_loss, perplexity=math.exp(global_loss), glob=True))
 
         self.model.load_state_dict(original_state_dict)
         self.model.train()

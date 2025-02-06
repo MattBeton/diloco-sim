@@ -52,7 +52,6 @@ class DilocoSimulator(Evaluator, SpartaInterpolator):
         self._broadcast_model_params()
 
     def _train_step(self):
-        # with autocast('cuda'):
         x, y = self._get_batch()
         self.optimizer.zero_grad()
         mini_batch_size = self.config.max_minibatch_size or self.config.batch_size
