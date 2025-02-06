@@ -158,7 +158,7 @@ class DilocoSimulator(Evaluator, SpartaInterpolator):
             if self.local_step % self.config.eval_interval == 0:
                 self._evaluate()
 
-            if self.config.ckpt_interval and self.local_step % self.config.ckpt_interval == 0:
+            if self.config.ckpt_interval and self.local_step % self.config.ckpt_interval == 0 and self.local_step > 0:
                 self._save_checkpoint()
 
             if self.config.corr_interval and self.local_step % self.config.corr_interval == 0:
@@ -173,7 +173,7 @@ class DilocoSimulator(Evaluator, SpartaInterpolator):
             self._setup(rank)
             self._train_loop()
 
-            if self.rank == 0 and self.config.save_dir:
+            if self.config.save_dir:
                 self._save_checkpoint()
         finally:
             self._cleanup()
