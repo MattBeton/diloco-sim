@@ -14,6 +14,7 @@ class DilocoSimulatorConfig:
     batch_size: int = 16
     eval_dataset: Optional[torch.utils.data.Dataset] = None
     ckpt_interval: Optional[int] = None  # num of outersteps to save model
+    corr_interval: Optional[int] = None  # num of outersteps to save model
     eval_iters: int = 400
     eval_interval: int = 1000
     save_dir: Optional[str] = None
