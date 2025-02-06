@@ -27,46 +27,48 @@ class Evaluator(DilocoSetup):
             param.data /= self.config.num_nodes
 
         if self.rank == 0:
-            ## Rank 0 calculates Local loss
+            # Compute local loss
             self.model.load_state_dict(original_state_dict)
-
-            losses = []
+            losses_local = []
             num_batches = math.ceil(self.config.eval_iters / self.config.batch_size)
             with torch.no_grad():
                 for _ in range(num_batches):
                     x, y = self._get_batch(eval=True)
                     output = self.model(x)
                     loss = self.config.loss_fn(output, y)
-                    losses.append(loss.item())
-
-            avg_loss = sum(losses) / len(losses)
-
-            print(f"LOCAL: Eval Loss: {avg_loss:.4f}, Eval Perplexity: {math.exp(avg_loss):.4f}")
-            self._log_eval(EvalStats(loss=avg_loss, perplexity=math.exp(avg_loss), glob=False))
-
+                    losses_local.append(loss.item())
+            local_loss = sum(losses_local) / len(losses_local)
+            print(f"LOCAL: Eval Loss: {local_loss:.4f}, Eval Perplexity: {math.exp(local_loss):.4f}")
+            self._log_eval(EvalStats(loss=local_loss, perplexity=math.exp(local_loss), glob=False))
         elif self.rank == 1:
-            ## Rank 1 calculates Global loss
-            losses = []
+            # Compute global loss
+            losses_global = []
             num_batches = math.ceil(self.config.eval_iters / self.config.batch_size)
             with torch.no_grad():
                 for _ in range(num_batches):
                     x, y = self._get_batch(eval=True)
                     output = self.model(x)
                     loss = self.config.loss_fn(output, y)
-                    losses.append(loss.item())
-
-            avg_loss = sum(losses) / len(losses)
-
-            print(f"GLOBAL: Eval Loss: {avg_loss:.4f}, Eval Perplexity: {math.exp(avg_loss):.4f}")
-            self._log_eval(EvalStats(loss=avg_loss, perplexity=math.exp(avg_loss), glob=True))
-
-            self.model.load_state_dict(original_state_dict)
-
+                    losses_global.append(loss.item())
+            global_loss = sum(losses_global) / len(losses_global)
         else:
-            self.model.load_state_dict(original_state_dict)
+            # Other ranks do not perform evaluation but must participate in broadcast.
+            pass
+
+        # Broadcast the global loss from rank 1 to all ranks.
+        # All ranks create a dummy tensor to participate.
+        global_loss_tensor = torch.empty(1, device=next(self.model.parameters()).device)
+        if self.rank == 1:
+            global_loss_tensor[0] = global_loss
+        torch.distributed.broadcast(global_loss_tensor, src=1)
+
+        # Only rank 0 logs the global evaluation.
+        if self.rank == 0:
+            global_loss = global_loss_tensor.item()
+            print(f"GLOBAL: Eval Loss: {global_loss:.4f}, Eval Perplexity: {math.exp(global_loss):.4f}")
+            self._log_eval(EvalStats(loss=global_loss, perplexity=math.exp(global_loss), glob=True))
 
         self.model.load_state_dict(original_state_dict)
-
         self.model.train()
 
     def _log_eval(self, eval_stats: EvalStats):
