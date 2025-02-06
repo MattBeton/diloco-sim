@@ -8,7 +8,8 @@ from .sparta import SpartaInterpolator
 from dataclasses import dataclass
 import wandb
 import torch.nn.utils as nn_utils
-
+import os
+import numpy as np
 
 @dataclass
 class TrainStats:
@@ -95,6 +96,53 @@ class DilocoSimulator(Evaluator, SpartaInterpolator):
             }
         )
 
+    def _correlation_calculation(self):
+        # Create a temporary directory for this timestep's checkpoints
+        tmp_dir = os.path.join(self.config.save_dir, f"tmp_corr_{self.local_step}")
+        os.makedirs(tmp_dir, exist_ok=True)
+
+        # Save model state dict for each rank
+        checkpoint_path = os.path.join(tmp_dir, f"{self.rank}.pt")
+        torch.save(self.model.state_dict(), checkpoint_path)
+
+        # Wait for all processes to save their checkpoints
+        torch.distributed.barrier()
+
+        if self.rank == 0:
+            # Load all models as vectors
+            model_vectors = []
+            for rank in range(self.config.num_nodes):
+                model_path = os.path.join(tmp_dir, f"{rank}.pt")
+                checkpoint = torch.load(model_path, map_location='cpu')
+                vector_list = []
+                for key in sorted(checkpoint.keys()):
+                    value = checkpoint[key]
+                    if isinstance(value, torch.Tensor):
+                        vector_list.append(value.cpu().numpy().ravel())
+                model_vectors.append(np.concatenate(vector_list))
+
+            # Calculate correlations between all pairs
+            correlations = []
+            for i in range(self.config.num_nodes):
+                for j in range(i+1, self.config.num_nodes):
+                    corr = np.corrcoef(model_vectors[i], model_vectors[j])[0,1]
+                    correlations.append(corr)
+                    
+            # Log average correlation to wandb
+            if self.config.wandb_project is not None:
+                wandb.log({
+                    "avg_model_correlation": np.mean(correlations),
+                    "min_model_correlation": np.min(correlations),
+                    "max_model_correlation": np.max(correlations)
+                }, step=self.local_step)
+
+            # Clean up temporary directory
+            import shutil
+            shutil.rmtree(tmp_dir)
+
+        # Wait for rank 0 to finish cleanup
+        torch.distributed.barrier()
+
     def _train_loop(self):
         while self.local_step < self.max_local_step:
 
@@ -109,6 +157,9 @@ class DilocoSimulator(Evaluator, SpartaInterpolator):
 
             if self.local_step % self.config.ckpt_interval == 0:
                 self._save_checkpoint()
+
+            if self.local_step % self.config.corr_interval == 0:
+                self._correlation_calculation()
 
             loss = self._train_step()
 

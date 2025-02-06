@@ -29,7 +29,8 @@ if __name__ == "__main__":
     parser.add_argument("--outer_momentum", type=float, nargs="+", default=0.9)
     parser.add_argument("--max_local_step", type=int, nargs="+", default=30000)
     parser.add_argument("--save_dir", type=str, nargs="+", default='checkpoints/')
-    parser.add_argument("--ckpt_interval", type=int, nargs="+", default=100000)
+    parser.add_argument("--ckpt_interval", type=int, nargs="+", default=None)
+    parser.add_argument("--corr_interval", type=int, nargs="+", default=100)
     parser.add_argument("--model_path", type=str, nargs="+", default=None)
     parser.add_argument("--wandb_project", type=str, nargs="+", default="diloco_owt")
     parser.add_argument("--wandb_name", type=str, default=None)
@@ -88,6 +89,7 @@ if __name__ == "__main__":
             max_local_step=args.max_local_step,
             save_dir=args.save_dir,
             ckpt_interval=args.ckpt_interval,
+            corr_interval=args.corr_interval,
             model_path=args.model_path,
             wandb_project=args.wandb_project,
             eval_iters=args.eval_iters,
