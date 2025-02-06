@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 # Load the OpenWebText dataset from HuggingFace
 def download_openwebtext():
-    dataset = load_dataset("openwebtext", split="train[:10%]")
+    dataset = load_dataset("openwebtext", split="train[:20%]")
     return dataset
 
 

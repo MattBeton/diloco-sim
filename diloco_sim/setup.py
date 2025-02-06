@@ -176,17 +176,37 @@ class DilocoSetup:
             self.config.eval_dataset, batch_size=self.config.batch_size, pin_memory=True, shuffle=True
         )
         self.eval_data_iter = iter(self.eval_dataloader)
-
-    # def _save_checkpoint(self):
-    #     torch.save(self.model.state_dict(), os.path.join(self.config.save_dir, f"model_{self.epoch}.pt"))
-
+    
     def _save_checkpoint(self):
         wandb_run_id = wandb.run.name
-        if not os.path.exists(os.path.join(self.config.save_dir, self.config.wandb_project, wandb_run_id, str(self.rank))):
-            os.makedirs(os.path.join(self.config.save_dir, self.config.wandb_project, wandb_run_id, str(self.rank)), exist_ok=True)
+        checkpoint_dir = os.path.join(self.config.save_dir, self.config.wandb_project, wandb_run_id, str(self.rank))
+
+        # Ensure directory exists
+        os.makedirs(checkpoint_dir, exist_ok=True)
 
         filename = f"{self.local_step}.pt"
-        torch.save(self.model.state_dict(), os.path.join(self.config.save_dir, self.config.wandb_project, wandb_run_id, str(self.rank), filename))
+        save_path = os.path.join(checkpoint_dir, filename)
+
+        try:
+            torch.save(self.model.state_dict(), save_path)
+        except OSError as e:
+            if "No space left on device" in str(e):
+                print("Warning: Not enough space. Attempting to free up space by deleting old checkpoints.")
+                try:
+                    # Remove old checkpoint files
+                    for f in os.listdir(checkpoint_dir):
+                        file_path = os.path.join(checkpoint_dir, f)
+                        if os.path.isfile(file_path):
+                            os.remove(file_path)
+                            print(f"Deleted: {file_path}")
+
+                    # Retry saving after cleanup
+                    torch.save(self.model.state_dict(), save_path)
+                    print("Model saved successfully after cleanup.")
+                except Exception as cleanup_error:
+                    print(f"Failed to free up space: {cleanup_error}")
+            else:
+                print(f"Failed to save model due to unexpected error: {e}")
 
     def _get_batch(self, eval=False):
         if not eval or self.eval_data_iter is None:
