@@ -44,7 +44,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--model_size", type=str, nargs="+", default="small", choices=["small", "base", "medium", "large", "xl"]
     )
-    parser.add_argument("--max_norm", type=float, nargs="+", default=None)
+    parser.add_argument("--max_norm", type=float, nargs="+", default=1.0)
     parser.add_argument("--port", type=int, default=12355)
     parser.add_argument("--seed", type=int, nargs="+", default=1337)
     parser.add_argument("--dataset_path", type=str, default="data/owt/openwebtext.bin")
