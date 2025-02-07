@@ -22,11 +22,10 @@ def run_command(command):
         sys.exit(1)
 
 def main():
-    # TODO: cosine annealing
     devices = '0 1 2 3'
     num_nodes = 4
 
-    global_command = f'python transformer.py --train --port 12355 --wandb_project owt_diloco_H --batch_size 16 --max_local_step 100 --corr_inteval 100000 --num_nodes {num_nodes} --devices {devices}'
+    global_command = f'python transformer.py --cosine_anneal --train --port 12355 --wandb_project owt_diloco_H_full --model_size base --batch_size 16 --max_local_step 30000 --corr_interval 100000 --num_nodes {num_nodes} --devices {devices}'
 
     for H in [200, 1000, 5000]:
         command1 = f' --p_sparta 0 --diloco_interval {H} --wandb_name dlc{H}'

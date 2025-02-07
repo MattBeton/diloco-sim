@@ -23,7 +23,7 @@ def run_command(command):
 
 def main():
     # TODO: cosine annealing
-    global_command = 'python transformer.py --train --port 12355 --wandb_project owt_diloco_n --batch_size 16 --max_local_step 100 --corr_inteval 100000'
+    global_command = 'python transformer.py --train --port 12355 --wandb_project owt_diloco_n --batch_size 16 --max_local_step 100 --corr_interval 100000'
 
     devices = '0 1 2 3'
     num_nodes = 4
