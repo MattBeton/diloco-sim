@@ -31,7 +31,7 @@ def main():
     command1 = f' --p_sparta 0 --diloco_interval {H} --wandb_name dlc{H}'
     run_command(f'{global_command} {command1}')
 
-    command2 = f'--p_sparta {1/H} --diloco_interval {H} --wandb_name dlc{H}_p{1/H}'
+    command2 = f'--p_sparta 0.0005 --diloco_interval {H} --wandb_name dlc{H}_p0.0005'
     run_command(f'{global_command} {command2}')
 
 
@@ -39,7 +39,7 @@ def main():
     command1 = f' --p_sparta 0 --diloco_interval {H} --wandb_name dlc{H}'
     run_command(f'{global_command} {command1}')
 
-    command2 = f'--p_sparta {1/H} --diloco_interval {H} --wandb_name dlc{H}_p{1/H}'
+    command2 = f'--p_sparta 0.0005 --diloco_interval {H} --wandb_name dlc{H}_p0.0005'
     run_command(f'{global_command} {command2}')
 
 
