@@ -21,13 +21,13 @@ def run_command(command):
         print(f"Command failed with code {e.returncode}: {command}", flush=True)
         sys.exit(1)
 
-def main():
-    # TODO: cosine annealing
-    global_command = 'python transformer.py --train --port 12355 --wandb_project owt_diloco++_regularising --batch_size 16 --max_local_step 10000 --corr_inteval 100000'
 
-    devices = '0 1'
+def main():
+    global_command = 'python transformer.py --cosine_anneal --train --port 12355 --wandb_project owt_diloco++_regularising_full --model_size base --batch_size 16 --max_local_step 30000 --corr_interval 100000'
+
+    devices = '0 1 2 3'
     num_nodes = 4
-    diloco_interval = 1000
+    diloco_interval = 100
 
     baseline_command = f'--num_nodes 1 --devices {devices[0]} --p_sparta 0 --diloco_interval 100000 --learning_rate 0.0004 --wandb_name baseline_n1'
     run_command(f'{global_command} {baseline_command}')
