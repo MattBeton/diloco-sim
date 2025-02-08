@@ -34,6 +34,13 @@ def main():
     command2 = f' --num_nodes {num_nodes} --p_sparta 0.005 --diloco_interval {H} --wandb_name n{num_nodes}_dlc{H}_p0.005'
     run_command(f'{global_command} {command2}')
 
+    num_nodes = 16
+    command1 = f' --num_nodes {num_nodes} --p_sparta 0 --diloco_interval {H} --wandb_name n{num_nodes}_dlc{H}'
+    run_command(f'{global_command} {command1}')
+
+    command2 = f' --num_nodes {num_nodes} --p_sparta 0.005 --diloco_interval {H} --wandb_name n{num_nodes}_dlc{H}_p0.005'
+    run_command(f'{global_command} {command2}')
+
 
 if __name__ == "__main__":
     main()
