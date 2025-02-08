@@ -22,7 +22,7 @@ def run_command(command):
         sys.exit(1)
 
 def main():
-    devices = '0 1 2 3'
+    devices = '0 1 2 3 4 5 6 7'
 
     global_command = f'python transformer.py --cosine_anneal --train --port 12355 --wandb_project owt_diloco_N --model_size base --batch_size 16 --max_local_step 30000 --corr_interval 100000 --devices {devices}'
 
