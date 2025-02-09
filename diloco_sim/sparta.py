@@ -9,7 +9,7 @@ class SpartaInterpolator(DilocoSetup):
 
     def __init__(self, config: DilocoSimulatorConfig) -> None:
         super().__init__(config)
-        self.index_selector = RandomIndexSelector(self.config.p_sparta)
+        self.index_selector = ScheduledIndexSelector(self.config.p_sparta, self.config.diloco_interval)
         self.buffer: list[tuple[torch.Tensor, torch.Tensor]] = []  # (indices, values)
 
     def _interpolate_models(self):
@@ -75,3 +75,18 @@ class PartitionedIndexSelector(IndexSelector):
 #         )
 #         sort = grads.view(-1).argsort(descending=True).view(grads.shape)
 #         return sort < math.ceil(self.p * grads.numel())
+
+
+class ScheduledIndexSelector(IndexSelector):
+    def __init__(self, p, diloco_interval):
+        super().__init__(p)
+        self.call_count = 0
+        self.diloco_interval = diloco_interval
+
+    def get_indices(self, param):
+        # p linearly increases from 0 to 2p over each diloco interval
+        position = (self.call_count % self.diloco_interval) / self.diloco_interval
+        current_p = 2 * self.p * position
+        self.call_count += 1
+        
+        return torch.bernoulli(torch.full(param.shape, current_p, device=param.device)).bool()
