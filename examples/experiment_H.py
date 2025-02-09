@@ -27,19 +27,32 @@ def main():
 
     global_command = f'python transformer.py --cosine_anneal --train --port 12355 --wandb_project owt_diloco_H_full --model_size base --batch_size 16 --max_local_step 30000 --corr_interval 100000 --num_nodes {num_nodes} --devices {devices}'
 
-    H = 1000
+    # for H in [1000, 5000, 10000]:
+    H = 5000
     command1 = f' --p_sparta 0 --diloco_interval {H} --wandb_name dlc{H}'
     run_command(f'{global_command} {command1}')
 
     command2 = f'--p_sparta 0.0005 --diloco_interval {H} --wandb_name dlc{H}_p0.0005'
     run_command(f'{global_command} {command2}')
 
+    command2 = f'--p_sparta 0.0005 --diloco_interval {H} --learning_rate 0.0006 --wandb_name dlc{H}_p0.0005_lr50%'
+    run_command(f'{global_command} {command2}')
 
-    H = 5000
+    command2 = f'--p_sparta 0.0005 --diloco_interval {H} --learning_rate 0.0009 --wandb_name dlc{H}_p0.0005_lr125%'
+    run_command(f'{global_command} {command2}')
+
+
+    H = 10000
     command1 = f' --p_sparta 0 --diloco_interval {H} --wandb_name dlc{H}'
     run_command(f'{global_command} {command1}')
 
-    command2 = f'--p_sparta 0.0005 --diloco_interval {H} --wandb_name dlc{H}_p0.0005'
+    command2 = f'--p_sparta 0.005 --diloco_interval {H} --wandb_name dlc{H}_p0.005'
+    run_command(f'{global_command} {command2}')
+
+    command2 = f'--p_sparta 0.005 --diloco_interval {H} --learning_rate 0.0006 --wandb_name dlc{H}_p0.005_lr50%'
+    run_command(f'{global_command} {command2}')
+
+    command2 = f'--p_sparta 0.005 --diloco_interval {H} --learning_rate 0.0009 --wandb_name dlc{H}_p0.005_lr125%'
     run_command(f'{global_command} {command2}')
 
 

@@ -47,6 +47,9 @@ def main():
     command4 = f'--num_nodes {num_nodes} --devices {devices} --p_sparta 0.005 --diloco_interval {diloco_interval} --learning_rate 0.0007 --wandb_name dlc{diloco_interval}_p0.005_lr75%'
     run_command(f'{global_command} {command4}')
 
+    command4 = f'--num_nodes {num_nodes} --devices {devices} --p_sparta 0.005 --diloco_interval {diloco_interval} --learning_rate 0.0009 --wandb_name dlc{diloco_interval}_p0.005_lr125%'
+    run_command(f'{global_command} {command4}')
+
 
 if __name__ == "__main__":
     main()
