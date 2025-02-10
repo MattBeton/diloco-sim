@@ -41,10 +41,10 @@ def main():
     global_command = f'python transformer.py --train --port 12355 --wandb_project owt_diloco_H_correlation --model_size base --batch_size 16 --max_local_step 10000 --corr_interval 200 --num_nodes {num_nodes} --devices {devices}'
 
     H = 5000
-    command1 = f' --p_sparta 0 --diloco_interval {H} --wandb_name dlc{H}'
+    command1 = f' --p_sparta 0 --diloco_interval {H} --wandb_name n16_dlc{H}'
     run_command(f'{global_command} {command1}')
 
-    command2 = f'--p_sparta 0.0005 --diloco_interval {H} --wandb_name dlc{H}_p0.0005'
+    command2 = f'--p_sparta 0.0005 --diloco_interval {H} --wandb_name n16_dlc{H}_p0.0005'
     run_command(f'{global_command} {command2}')
 
 
