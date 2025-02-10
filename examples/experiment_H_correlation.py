@@ -35,6 +35,18 @@ def main():
     run_command(f'{global_command} {command2}')
 
 
+    devices = '0 1 2 3 4 5 6 7'
+    num_nodes = 16
+
+    global_command = f'python transformer.py --train --port 12355 --wandb_project owt_diloco_H_correlation --model_size base --batch_size 16 --max_local_step 10000 --corr_interval 200 --num_nodes {num_nodes} --devices {devices}'
+
+    H = 5000
+    command1 = f' --p_sparta 0 --diloco_interval {H} --wandb_name dlc{H}'
+    run_command(f'{global_command} {command1}')
+
+    command2 = f'--p_sparta 0.0005 --diloco_interval {H} --wandb_name dlc{H}_p0.0005'
+    run_command(f'{global_command} {command2}')
+
 
 if __name__ == "__main__":
     main()
