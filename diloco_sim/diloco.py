@@ -128,16 +128,23 @@ class DilocoSimulator(Evaluator, SpartaInterpolator):
             correlations = []
             for i in range(self.config.num_nodes):
                 for j in range(i+1, self.config.num_nodes):
-                    corr = np.corrcoef(model_vectors[i], model_vectors[j])[0,1]
+                    corr = np.corrcoef(model_vectors[i], model_vectors[j])[0, 1]
                     correlations.append(corr)
-                    
-            # Log average correlation to wandb
+
+            # *** Additional variance logging: compute element-wise parameter variance across models.
+            stacked_vectors = np.stack(model_vectors, axis=0)  # shape: (num_nodes, total_params)
+            param_variance = np.var(stacked_vectors, axis=0)     # variance for each parameter element
+            avg_param_variance = np.mean(param_variance)
+
+            # Log average correlation and average parameter variance to wandb
             if self.config.wandb_project is not None:
-                wandb.log({
-                    "avg_model_correlation": np.mean(correlations),
-                    "min_model_correlation": np.min(correlations),
-                    "max_model_correlation": np.max(correlations)
-                }, step=self.local_step)
+                wandb.log(
+                    {
+                        "avg_model_correlation": np.mean(correlations),
+                        "avg_parameter_variance": avg_param_variance,
+                    },
+                    step=self.local_step,
+                )
 
             # Clean up temporary directory
             import shutil
