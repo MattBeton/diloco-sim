@@ -29,32 +29,31 @@ def main():
 
     # for H in [1000, 5000, 10000]:
     H = 5000
+    p_sparta = 0.005
     command1 = f' --p_sparta 0 --diloco_interval {H} --wandb_name dlc{H}'
     run_command(f'{global_command} {command1}')
 
-    command2 = f'--p_sparta 0.0005 --diloco_interval {H} --wandb_name dlc{H}_p0.0005'
+    command2 = f'--p_sparta {p_sparta} --diloco_interval {H} --wandb_name dlc{H}_p{p_sparta}'
     run_command(f'{global_command} {command2}')
 
-    command2 = f'--p_sparta 0.0005 --diloco_interval {H} --learning_rate 0.0006 --wandb_name dlc{H}_p0.0005_lr50%'
+    command2 = f'--p_sparta {p_sparta} --diloco_interval {H} --learning_rate 0.0006 --wandb_name dlc{H}_p{p_sparta}_lr50%'
     run_command(f'{global_command} {command2}')
 
-    command2 = f'--p_sparta 0.0005 --diloco_interval {H} --learning_rate 0.0009 --wandb_name dlc{H}_p0.0005_lr125%'
+    command2 = f'--p_sparta {p_sparta} --diloco_interval {H} --learning_rate 0.0008 --wandb_name dlc{H}_p{p_sparta}_lr100%'
     run_command(f'{global_command} {command2}')
-
 
     H = 10000
     command1 = f' --p_sparta 0 --diloco_interval {H} --wandb_name dlc{H}'
     run_command(f'{global_command} {command1}')
 
-    command2 = f'--p_sparta 0.005 --diloco_interval {H} --wandb_name dlc{H}_p0.005'
+    command2 = f'--p_sparta {p_sparta} --diloco_interval {H} --wandb_name dlc{H}_p{p_sparta}'
     run_command(f'{global_command} {command2}')
 
-    command2 = f'--p_sparta 0.005 --diloco_interval {H} --learning_rate 0.0006 --wandb_name dlc{H}_p0.005_lr50%'
+    command2 = f'--p_sparta {p_sparta} --diloco_interval {H} --learning_rate 0.0006 --wandb_name dlc{H}_p{p_sparta}_lr50%'
     run_command(f'{global_command} {command2}')
 
-    command2 = f'--p_sparta 0.005 --diloco_interval {H} --learning_rate 0.0009 --wandb_name dlc{H}_p0.005_lr125%'
+    command2 = f'--p_sparta {p_sparta} --diloco_interval {H} --learning_rate 0.0008 --wandb_name dlc{H}_p{p_sparta}_lr100%'
     run_command(f'{global_command} {command2}')
-
 
 if __name__ == "__main__":
     main()

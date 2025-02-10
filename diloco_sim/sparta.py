@@ -9,7 +9,8 @@ class SpartaInterpolator(DilocoSetup):
 
     def __init__(self, config: DilocoSimulatorConfig) -> None:
         super().__init__(config)
-        self.index_selector = ScheduledIndexSelector(self.config.p_sparta, self.config.diloco_interval)
+        # self.index_selector = ScheduledIndexSelector(self.config.p_sparta, self.config.diloco_interval)
+        self.index_selector = RandomIndexSelector(self.config.p_sparta)
         self.buffer: list[tuple[torch.Tensor, torch.Tensor]] = []  # (indices, values)
 
     def _interpolate_models(self):

@@ -28,13 +28,13 @@ def main():
 
     H = 100
 
-    for num_nodes in [4, 8, 24]:
+    for num_nodes in [4, 16]:
         H = 100
         command1 = f' --num_nodes {num_nodes} --p_sparta 0 --diloco_interval {H} --wandb_name n{num_nodes}_dlc{H}'
         run_command(f'{global_command} {command1}')
 
-        H = 5000
-        command2 = f' --num_nodes {num_nodes} --p_sparta 0.005 --learning_rate 0.0009 --diloco_interval {H} --wandb_name n{num_nodes}_dlc{H}_p0.005_lr125%'
+        H = 10000
+        command2 = f' --num_nodes {num_nodes} --p_sparta 0.005 --learning_rate 0.0008 --diloco_interval {H} --wandb_name n{num_nodes}_dlc{H}_p0.005_lr100%'
         run_command(f'{global_command} {command2}')
 
 
